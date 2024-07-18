@@ -30,6 +30,7 @@
         {
             SplitContainer _ioSplitContainer;
             Button _configButton;
+            _chooseVuzComboBox = new ComboBox();
             _cancelButton = new Button();
             _configInfoTextBox = new TextBox();
             _findButton = new Button();
@@ -52,6 +53,7 @@
             // 
             // _ioSplitContainer.Panel1
             // 
+            _ioSplitContainer.Panel1.Controls.Add(_chooseVuzComboBox);
             _ioSplitContainer.Panel1.Controls.Add(_cancelButton);
             _ioSplitContainer.Panel1.Controls.Add(_configInfoTextBox);
             _ioSplitContainer.Panel1.Controls.Add(_configButton);
@@ -65,6 +67,17 @@
             _ioSplitContainer.SplitterDistance = 274;
             _ioSplitContainer.SplitterWidth = 10;
             _ioSplitContainer.TabIndex = 0;
+            // 
+            // _chooseVuzComboBox
+            // 
+            _chooseVuzComboBox.DisplayMember = "UserFriendlyName";
+            _chooseVuzComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            _chooseVuzComboBox.FormattingEnabled = true;
+            _chooseVuzComboBox.Location = new Point(149, 123);
+            _chooseVuzComboBox.Name = "_chooseVuzComboBox";
+            _chooseVuzComboBox.Size = new Size(131, 38);
+            _chooseVuzComboBox.TabIndex = 4;
+            _chooseVuzComboBox.SelectedIndexChanged += _chooseVuzComboBox_SelectedIndexChanged;
             // 
             // _cancelButton
             // 
@@ -142,5 +155,6 @@
         private TextBox _configInfoTextBox;
         private Button _findButton;
         private Button _cancelButton;
+        private ComboBox _chooseVuzComboBox;
     }
 }
