@@ -3,9 +3,10 @@ using AngleSharp.Html.Parser;
 
 namespace MephiWatcher.Parsers
 {
-    public class MephiParser : IVuzParser
+    [VuzParserName("mephi")]
+    public class MephiParser(IHttpClientProvider httpClientProvider) : IVuzParser
     {
-        private readonly HttpClient _httpClient = new();
+        private readonly HttpClient _httpClient = httpClientProvider.Client;
         private readonly HtmlParser _htmlParser = new();
 
         public async Task<VuzProgram[]> ParseProgramsAsync(Uri url, CancellationToken ct = default)

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using MephiWatcher.Parsers;
@@ -25,18 +26,33 @@ namespace MephiWatcher
 
 
         private readonly IConfigFactory _configFactory;
-        private readonly IVuzParser _parser;
+        private readonly Dictionary<string, IVuzParser> _parsers;
+
+        private VuzConfig? CurrentVuzConfig
+        {
+            get
+            {
+                if (_chooseVuzComboBox.SelectedIndex == -1)
+                    return null;
+                return (VuzConfig)_chooseVuzComboBox.Items[_chooseVuzComboBox.SelectedIndex]!;
+            }
+        }
 
         private Config _config;
         private CancellationTokenSource? _cancellation;
 
-        public MainForm(IConfigFactory configFactory, IVuzParser parser)
+        public MainForm(IConfigFactory configFactory, IEnumerable<IVuzParser> parsers)
         {
             InitializeComponent();
             _configFactory = configFactory;
-            _parser = parser;
+            _parsers = parsers.ToDictionary(GetVuzParserName);
             _config = configFactory.Create();
-            UpdateConfigInfo();
+            UpdateConfigInfo(true);
+        }
+
+        private static string GetVuzParserName(IVuzParser p)
+        {
+            return p.GetType().GetCustomAttribute<VuzParserNameAttribute>()?.Name ?? throw new InvalidOperationException($"VuzParser does not have a {nameof(VuzParserNameAttribute)}");
         }
 
 #pragma warning disable IDE1006 // Events in this project are named precisely like {control}_{event}
@@ -49,11 +65,16 @@ namespace MephiWatcher
             }
             _programsFlowLayoutPanel.Controls.Clear();
 
+            if (CurrentVuzConfig is null)
+            {
+                return;
+            }
             _findButton.Enabled = false;
             _cancellation = new CancellationTokenSource();
             try
             {
-                var entries = ParseRatingWebsiteAsync(_cancellation.Token);
+                var parser = _parsers[CurrentVuzConfig.Name.ToLowerInvariant()];
+                var entries = ParseRatingWebsiteAsync(parser, _cancellation.Token);
                 await foreach (var entry in entries)
                 {
                     var box = CreateTextBox(entry);
@@ -89,7 +110,7 @@ namespace MephiWatcher
             var process = Process.Start("notepad", "config.json");
             process.WaitForExit();
             _config = _configFactory.Create();
-            UpdateConfigInfo();
+            UpdateConfigInfo(true);
         }
 
         private void _cancelButton_Click(object sender, EventArgs e)
@@ -103,12 +124,22 @@ namespace MephiWatcher
                 return;
             e.Control.Width = _programsFlowLayoutPanel.Width;
         }
+
+        private void _chooseVuzComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _cancellation?.Cancel();
+            UpdateConfigInfo(false);
+        }
 #pragma warning restore IDE1006
 
-        private async IAsyncEnumerable<EntryDto> ParseRatingWebsiteAsync([EnumeratorCancellation] CancellationToken ct = default)
+        private async IAsyncEnumerable<EntryDto> ParseRatingWebsiteAsync(IVuzParser parser, [EnumeratorCancellation] CancellationToken ct = default)
         {
-            var programs = (await _parser.ParseProgramsAsync(_config.RatingUrl, ct)).Where(ProgramSatisfies);
-            var ratings = programs.Select(async p => await _parser.RarseProgramRatingAsync(p, ct));
+            if (CurrentVuzConfig is null)
+            {
+                yield break;
+            }
+            var programs = (await parser.ParseProgramsAsync(CurrentVuzConfig.Url, ct)).Where(ProgramSatisfies);
+            var ratings = programs.Select(async p => await parser.RarseProgramRatingAsync(p, ct));
             foreach (var task in ratings)
             {
                 ct.ThrowIfCancellationRequested();
@@ -136,7 +167,7 @@ namespace MephiWatcher
         private bool ProgramSatisfies(VuzProgram program)
         {
             //return program.Name.Contains("очная форма") && !program.Name.Contains("квота") && !program.Name.Contains("прием");
-            return _config.ProgramNames.Contains(program.Name.Trim());
+            return CurrentVuzConfig?.ProgramNames.Contains(program.Name.Trim()) ?? throw new InvalidOperationException("Vuz not selected");
         }
 
         private static TextBox CreateTextBox(EntryDto dto)
@@ -155,17 +186,30 @@ namespace MephiWatcher
             return box;
         }
 
-        private void UpdateConfigInfo()
+        private void UpdateConfigInfo(bool updateVuzList)
         {
-            var builder = new StringBuilder();
-            foreach (var program in _config.ProgramNames)
+            if (updateVuzList)
             {
-                builder.Append(program.Length >= 80 ? program[..80] : program);
-                builder.AppendLine(" ...");
+                _chooseVuzComboBox.Items.Clear();
+                foreach (var vuzConfig in _config.VuzConfigs)
+                {
+                    _chooseVuzComboBox.Items.Add(vuzConfig);
+                }
+            }
+
+            StringBuilder? builder = null;
+            if (CurrentVuzConfig is not null)
+            {
+                builder = new();
+                foreach (var program in CurrentVuzConfig.ProgramNames)
+                {
+                    builder.Append(program.Length >= 80 ? program[..80] : program);
+                    builder.AppendLine(" ...");
+                }
             }
             _configInfoTextBox.Text = $"""
                                       Баллы: {_config.TotalPoints}, Программы:
-                                      {builder}
+                                      {(builder is null ? "вуз не выбран" : builder)}
                                       """;
         }
 

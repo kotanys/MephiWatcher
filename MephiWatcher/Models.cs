@@ -30,11 +30,3 @@ public enum Status
     Possible,
     Fail
 }
-
-public record Config
-{
-    public required Uri RatingUrl { get; init; }
-    public required int TotalPoints { get; init; }
-    public required string Document { get; init; }
-    public required List<string> ProgramNames { get; init; }
-}
