@@ -209,7 +209,7 @@ namespace MephiWatcher
             }
             _configInfoTextBox.Text = $"""
                                       Баллы: {_config.TotalPoints}, Программы:
-                                      {(builder is null ? "вуз не выбран" : builder)}
+                                      {builder?.ToString() ?? "вуз не выбран"}
                                       """;
         }
 
@@ -253,7 +253,7 @@ namespace MephiWatcher
         {
             Status.Fail => Color.Red,
             Status.Possible => Color.Yellow,
-            Status.Pass => Color.Green,
+            Status.Pass => Color.LimeGreen,
             _ => throw new ArgumentException("Unknown status")
         };
     }
