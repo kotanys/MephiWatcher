@@ -3,7 +3,7 @@
 public record Config
 {
     public required int TotalPoints { get; init; }
-    public required string Document { get; init; }
+    public required AbiturDocument Document { get; init; }
     public required VuzConfig[] VuzConfigs { get; init; }
 }
 
