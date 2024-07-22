@@ -7,7 +7,7 @@ public record VuzProgram(
 
 public record ProgramRating(
     VuzProgram Program,
-    IEnumerable<Entry> Entries
+    Entry[] Entries
     );
 
 public record Entry(

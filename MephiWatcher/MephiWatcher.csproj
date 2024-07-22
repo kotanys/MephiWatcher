@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.1.2" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="126.2.180" />
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="126.2.180" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
