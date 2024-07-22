@@ -1,4 +1,6 @@
 
+using CefSharp.OffScreen;
+using CefSharp;
 using MephiWatcher.Parsers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,9 @@ namespace MephiWatcher
         [STAThread]
         private static void Main()
         {
+            var settings = new CefSettings();
+            Cef.Initialize(settings);
+
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
@@ -25,6 +30,7 @@ namespace MephiWatcher
             var services = new ServiceCollection();
             services.AddSingleton<IConfigFactory>(new ConfigFactory("config.json"));
             services.AddSingleton<IVuzParser, MephiParser>();
+            services.AddSingleton<IVuzParser, MireaParser>();
             services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
             services.AddTransient<MainForm>();
             return services.BuildServiceProvider();

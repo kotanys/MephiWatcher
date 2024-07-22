@@ -145,7 +145,7 @@ namespace MephiWatcher
                 ct.ThrowIfCancellationRequested();
 
                 var rating = await task;
-                var totalCount = rating.Entries.Count();
+                var totalCount = rating.Entries.Length;
                 Entry? existing = rating.Entries.SingleOrDefault(IsMe);
                 if (existing is not null)
                 {
@@ -179,7 +179,7 @@ namespace MephiWatcher
                 BackColor = MakeColor(dto),
             };
             box.Height *= 2;
-            box.Click += (s, e) => new Process { StartInfo = { UseShellExecute = true, WindowStyle = ProcessWindowStyle.Hidden, CreateNoWindow = true, FileName = "cmd.exe", Arguments = "/c start " + dto.Program.Url } }.Start();
+            box.Click += (s, e) => new Process { StartInfo = { UseShellExecute = true, WindowStyle = ProcessWindowStyle.Hidden, CreateNoWindow = true, FileName = "cmd.exe", Arguments = "/c start " + dto.Program.Url.ToString().Replace("&", "^&") } }.Start();
             return box;
         }
 
