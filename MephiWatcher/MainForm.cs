@@ -159,10 +159,7 @@ namespace MephiWatcher
             }
         }
 
-        private bool IsMe(Entry rating)
-        {
-            return rating.Document == _config.Document;
-        }
+        private bool IsMe(Entry rating) => rating.Document.Equals(_config.Document);
 
         private bool ProgramSatisfies(VuzProgram program)
         {
@@ -182,7 +179,7 @@ namespace MephiWatcher
                 BackColor = MakeColor(dto),
             };
             box.Height *= 2;
-            box.Click += (s, e) => new Process { StartInfo = { UseShellExecute = true, CreateNoWindow = true, FileName = "cmd.exe", Arguments = "/c start " + dto.Program.Url } }.Start();
+            box.Click += (s, e) => new Process { StartInfo = { UseShellExecute = true, WindowStyle = ProcessWindowStyle.Hidden, CreateNoWindow = true, FileName = "cmd.exe", Arguments = "/c start " + dto.Program.Url } }.Start();
             return box;
         }
 

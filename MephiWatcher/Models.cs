@@ -13,7 +13,7 @@ public record ProgramRating(
 public record Entry(
     VuzProgram Program,
     int SerialNumber,
-    string Document,
+    AbiturDocument Document,
     int Points,
     Status Status
     );

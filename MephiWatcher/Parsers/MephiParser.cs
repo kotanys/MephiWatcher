@@ -33,7 +33,7 @@ namespace MephiWatcher.Parsers
         private static Entry TrToEntry(IElement element, VuzProgram program)
         {
             var serial = int.Parse(element.Children[0].TextContent.Trim());
-            var document = element.Children[1].TextContent.Trim();
+            var document = AbiturDocumentFactory.Create(element.Children[1].TextContent.Trim());
             var pointsText = element.Children[4].TextContent;
             int points;
             if (string.IsNullOrEmpty(pointsText) || pointsText == "-")
