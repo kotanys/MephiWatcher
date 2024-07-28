@@ -9,7 +9,7 @@ namespace MephiWatcher.Parsers
         private readonly HttpClient _httpClient = httpClientProvider.Client;
         private readonly HtmlParser _htmlParser = new();
 
-        public async Task<VuzProgram[]> ParseProgramsAsync(Uri url, CancellationToken ct = default)
+        public async Task<UniversityProgram[]> ParseProgramsAsync(Uri url, CancellationToken ct = default)
         {
             var html = await GetHtmlAsync(url, ct);
             var parse = _htmlParser.ParseDocument(html);
@@ -18,7 +18,7 @@ namespace MephiWatcher.Parsers
             return programs.ToArray();
         }
 
-        public async Task<ProgramRating> RarseProgramRatingAsync(VuzProgram program, CancellationToken ct)
+        public async Task<ProgramRating> RarseProgramRatingAsync(UniversityProgram program, CancellationToken ct)
         {
             var programHtml = await GetHtmlAsync(program.Url, ct);
             var parsed = _htmlParser.ParseDocument(programHtml);
@@ -30,7 +30,7 @@ namespace MephiWatcher.Parsers
             return new ProgramRating(program, entries);
         }
 
-        private static Entry TrToEntry(IElement element, VuzProgram program)
+        private static Entry TrToEntry(IElement element, UniversityProgram program)
         {
             var serial = int.Parse(element.Children[0].TextContent.Trim());
             var document = AbiturDocumentFactory.Create(element.Children[1].TextContent.Trim());
@@ -42,11 +42,11 @@ namespace MephiWatcher.Parsers
             return new Entry(program, serial, document, points, Status.Pass);
         }
 
-        private static VuzProgram TrToProgram(IElement element, Uri baseUrl)
+        private static UniversityProgram TrToProgram(IElement element, Uri baseUrl)
         {
             var name = element.Children[0].TextContent;
             var url = element.Children[1].Children[0].GetAttribute("href") ?? throw new ArgumentException("Row does not have a link attached");
-            return new VuzProgram(name.Trim(), new Uri(baseUrl.GetLeftPart(UriPartial.Authority) + url));
+            return new UniversityProgram(name.Trim(), new Uri(baseUrl.GetLeftPart(UriPartial.Authority) + url));
         }
 
         private async Task<string> GetHtmlAsync(Uri url, CancellationToken ct) => await _httpClient.GetStringAsync(url, ct);

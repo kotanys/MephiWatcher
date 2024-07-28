@@ -28,13 +28,13 @@ namespace MephiWatcher
         private readonly IConfigFactory _configFactory;
         private readonly Dictionary<string, IVuzParser> _parsers;
 
-        private VuzConfig? CurrentVuzConfig
+        private UniversityConfig? CurrentVuzConfig
         {
             get
             {
                 if (_chooseVuzComboBox.SelectedIndex == -1)
                     return null;
-                return (VuzConfig)_chooseVuzComboBox.Items[_chooseVuzComboBox.SelectedIndex]!;
+                return (UniversityConfig)_chooseVuzComboBox.Items[_chooseVuzComboBox.SelectedIndex]!;
             }
         }
 
@@ -161,7 +161,7 @@ namespace MephiWatcher
 
         private bool IsMe(Entry rating) => rating.Document.Equals(_config.Document);
 
-        private bool ProgramSatisfies(VuzProgram program)
+        private bool ProgramSatisfies(UniversityProgram program)
         {
             //return program.Name.Contains("очная форма") && !program.Name.Contains("квота") && !program.Name.Contains("прием");
             return CurrentVuzConfig?.ProgramNames.Contains(program.Name.Trim()) ?? throw new InvalidOperationException("Vuz not selected");
@@ -188,7 +188,7 @@ namespace MephiWatcher
             if (updateVuzList)
             {
                 _chooseVuzComboBox.Items.Clear();
-                foreach (var vuzConfig in _config.VuzConfigs)
+                foreach (var vuzConfig in _config.UniversityConfigs)
                 {
                     _chooseVuzComboBox.Items.Add(vuzConfig);
                 }
