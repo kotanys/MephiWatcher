@@ -1,17 +1,18 @@
 ﻿namespace MephiWatcher;
 
-public record VuzProgram(
+
+public record UniversityProgram(
     string Name,
     Uri Url
     );
 
 public record ProgramRating(
-    VuzProgram Program,
+    UniversityProgram Program,
     Entry[] Entries
     );
 
 public record Entry(
-    VuzProgram Program,
+    UniversityProgram Program,
     int SerialNumber,
     AbiturDocument Document,
     int Points,
@@ -21,7 +22,7 @@ public record Entry(
 public record EntryDto(
     int SerialNumber,
     int TotalNumber,
-    VuzProgram Program,
+    UniversityProgram Program,
     Status Status);
 
 public enum Status

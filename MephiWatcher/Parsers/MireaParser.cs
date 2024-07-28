@@ -11,7 +11,7 @@ namespace MephiWatcher.Parsers
     {
         private readonly HtmlParser _htmlParser = new();
 
-        public async Task<VuzProgram[]> ParseProgramsAsync(Uri url, CancellationToken ct)
+        public async Task<UniversityProgram[]> ParseProgramsAsync(Uri url, CancellationToken ct)
         {
             var html = await GetHtmlOfLoadedPage(url, ct);
             var parse = await _htmlParser.ParseDocumentAsync(html);
@@ -37,14 +37,14 @@ namespace MephiWatcher.Parsers
             return zipped;
         }
 
-        private static VuzProgram ZipToProgram(IElement headerRow, IElement linkRow, Uri baseUrl)
+        private static UniversityProgram ZipToProgram(IElement headerRow, IElement linkRow, Uri baseUrl)
         {
             var name = headerRow.Children[0].Children[0].InnerHtml.Trim();
             var url = linkRow.Children[5].Children[0].GetAttribute("href");
-            return new VuzProgram(name, new Uri(baseUrl.GetLeftPart(UriPartial.Authority) + url));
+            return new UniversityProgram(name, new Uri(baseUrl.GetLeftPart(UriPartial.Authority) + url));
         }
 
-        public async Task<ProgramRating> RarseProgramRatingAsync(VuzProgram program, CancellationToken ct)
+        public async Task<ProgramRating> RarseProgramRatingAsync(UniversityProgram program, CancellationToken ct)
         {
             var html = await GetHtmlOfLoadedPage(program.Url, ct);
             var parse = await _htmlParser.ParseDocumentAsync(html);
@@ -56,7 +56,7 @@ namespace MephiWatcher.Parsers
             return new ProgramRating(program, entries.ToArray());
         }
 
-        private static Entry TrToEntry(IElement entry, VuzProgram program, int index)
+        private static Entry TrToEntry(IElement entry, UniversityProgram program, int index)
         {
             var document = AbiturDocumentFactory.Create(entry.GetAttribute("data-snils")!);
             var points = int.Parse(entry.Children[10].InnerHtml);
@@ -85,7 +85,10 @@ namespace MephiWatcher.Parsers
                 var tcs = new TaskCompletionSource<bool>();
                 browser.LoadingStateChanged += (sender, args) =>
                 {
-                    ct.ThrowIfCancellationRequested();
+                    if (ct.IsCancellationRequested)
+                    {
+                        tcs.SetCanceled();
+                    }
                     if (!args.IsLoading)
                     {
                         tcs.TrySetResult(true);
