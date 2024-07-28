@@ -22,7 +22,8 @@ namespace MephiWatcher.Parsers
         {
             var programHtml = await GetHtmlAsync(program.Url, ct);
             var parsed = _htmlParser.ParseDocument(programHtml);
-            var rows = parsed.GetElementsByTagName("tr").Skip(3).Where(el => el.GetElementsByTagName("th").Length == 0);
+            var rows = parsed.GetElementsByTagName("tr").Skip(3).Where(el => el.GetElementsByTagName("th").Length == 0
+                && el.Children[8].TextContent == "Высший приоритет");
 
             int i = 0;
             var entries = rows.Select(r => TrToEntry(r, program)).OrderByDescending(e => e.Points)
