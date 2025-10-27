@@ -1,0 +1,21 @@
+{
+  "TotalPoints": 300,
+  "Document": "",
+  "UniversityConfigs": [
+    {
+      "UserFriendlyName": "МИФИ",
+      "Name": "mephi",
+      "Url": "https://org.mephi.ru/pupil-rating",
+      "ProgramNames": [
+      ]
+    },
+
+    {
+      "UserFriendlyName": "МИРЭА",
+      "Name": "mirea",
+      "Url": "https://priem.mirea.ru/accepted-entrants-list/",
+      "ProgramNames": [
+      ]
+    }
+  ]
+}
